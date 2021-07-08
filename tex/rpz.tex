@@ -1,7 +1,7 @@
 %% Преамбула TeX-файла
 
 % 1. Стиль и язык
-\documentclass[utf8x, 14pt]{G7-32} % Стиль (по умолчанию будет 14pt)
+\documentclass[utf8x,times, 14pt]{G7-32} % Стиль (по умолчанию будет 14pt)
 
 % Остальные стандартные настройки убраны в preamble.inc.tex.
 \include{preamble.inc}
@@ -13,18 +13,31 @@
 \usepackage{local-minted}
 \fi
 
+\usepackage{indentfirst}
+\usepackage{ulem} % Нормальное нижнее подчеркивание
+
+% Дополнительное окружения для подписей
+\usepackage{array}
+\newenvironment{signstabular}[1][1]{
+	\renewcommand*{\arraystretch}{#1}
+	\tabular
+}{
+	\endtabular
+}
+
+
+\newcommand{\frc}[2]{\raisebox{2pt}{$#1$}\big/\raisebox{-3pt}{$#2$}}    % a/b, a выше, b ниже
+
 % Полезные макросы листингов.
 \include{macros.inc}
-
-% Стиль титульного листа и заголовки
-\include{00-title}
 
 
 \begin{document}
 
 \frontmatter % выключает нумерацию ВСЕГО; здесь начинаются ненумерованные главы: реферат, введение, глоссарий, сокращения и прочее.
 
-%\maketitle %создает титульную страницу
+\include{00-title}
+
 
 
 % \begin{executors}
@@ -64,7 +77,7 @@
 % \include{70-bzd}
 
 \backmatter %% Здесь заканчивается нумерованная часть документа и начинаются ссылки и
-            
+
 \include{80-conclusion}%% заключение
 
 
