@@ -1,20 +1,146 @@
 @Comment А вот так оформляется библиография при помощи BibTeX.
 
-@Book{Pup09,
-  author =		 {Василий Пупкин and Эйнштейн, А.},
-  title = 		 {\LaTeX для <<чайников>>},
-  publisher = 	 {М.},
-  pagetotal = {299},
-  year = 		 {2009},
-  language =     "russian"
+@article{RONNOW202136,
+title = {Fast analytical motion blur with transparency},
+journal = {Computers Graphics},
+volume = {95},
+pages = {36-46},
+year = {2021},
+issn = {0097-8493},
+doi = {https://doi.org/10.1016/j.cag.2021.01.006},
+url = {https://www.sciencedirect.com/science/article/pii/S0097849321000066},
+author = {Mads J.L. Rønnow and Ulf Assarsson and Marco Fratarcangeli},
+keywords = {Real-time rendering, Motion blur, Parallel computing},
+abstract = {We introduce a practical parallel technique to achieve real-time motion blur for textured and semi-transparent triangles with high accuracy using modern commodity GPUs. In our approach, moving triangles are represented as prisms. Each prism is bounded by the initial and final position of the triangle during one animation frame and three bilinear patches on the sides. Each prism covers a number of pixels for a certain amount of time according to its trajectory on the screen. We efficiently find, store and sort the list of prisms covering each pixel including the amount of time the pixel is covered by each prism. This information, together with the color, texture, normal, and transparency of the pixel, is used to resolve its final color. We demonstrate the performance, scalability, and generality of our approach in a number of test scenarios, showing that it achieves a visual quality practically indistinguishable from the ground truth in a matter of just a few milliseconds, including rendering of textured and transparent objects. A supplementary video has been made available online.11Supplementary video available here}
 }
 
-@online{wiki:latex,
-  author = {Wikipedia},
-  title = {Типографика "--- Википедия},
-  year = {2012},
-  url = {https://ru.wikipedia.org/wiki/%D0%A2%D0%B8%D0%BF%D0%BE%D0%B3%D1%80%D0%B0%D1%84%D0%B8%D0%BA%D0%B0},
-  urldate = {25.01.2012},
-  language =     "russian"
+
+@article{Navarro11,
+author = {Navarro, Fernando and Serón, Francisco J. and Gutierrez, Diego},
+title = {Motion Blur Rendering: State of the Art},
+journal = {Computer Graphics Forum},
+volume = {30},
+number = {1},
+pages = {3-26},
+keywords = {motion blur, temporal antialiasing, sampling and reconstruction, rendering, shading, visibility, analytic methods, geometric substitution, Monte Carlo sampling, postprocessing, hybrid methods, I.3.3 Computer Graphics: Picture/Image Generation—Antialiasing},
+doi = {https://doi.org/10.1111/j.1467-8659.2010.01840.x},
+url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1467-8659.2010.01840.x},
+eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1467-8659.2010.01840.x},
+abstract = {Abstract Motion blur is a fundamental cue in the perception of objects in motion. This phenomenon manifests as a visible trail along the trajectory of the object and is the result of the combination of relative motion and light integration taking place in film and electronic cameras. In this work, we analyse the mechanisms that produce motion blur in recording devices and the methods that can simulate it in computer generated images. Light integration over time is one of the most expensive processes to simulate in high-quality renders, as such, we make an in-depth review of the existing algorithms and we categorize them in the context of a formal model that highlights their differences, strengths and limitations. We finalize this report proposing a number of alternative classifications that will help the reader identify the best technique for a particular scenario.},
+year = {2011}
+}
+
+@article{10.1145/97880.97913,
+author = {Haeberli, Paul and Akeley, Kurt},
+title = {The Accumulation Buffer: Hardware Support for High-Quality Rendering},
+year = {1990},
+issue_date = {Aug. 1990},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {24},
+number = {4},
+issn = {0097-8930},
+url = {https://doi.org/10.1145/97880.97913},
+doi = {10.1145/97880.97913},
+abstract = {This paper describes a system architecture that supports realtime generation of complex
+images, efficient generation of extremely high-quality images, and a smooth trade-off
+between the two.Based on the paradigm of integration, the architecture extends a state-of-the-art
+rendering system with an additional high-precision image buffer. This additional buffer,
+called the Accumulation Buffer, is used to integrate images that are rendered into
+the framebuffer. While originally conceived as a solution to the problem of aliasing,
+the Accumulation Buffer provides a general solution to the problems of motion blur
+and depth-of-field as well.Because the architecture is a direct extension of current
+workstation rendering technology, we begin by discussing the performance and quality
+characteristics of that technology. The problem of spatial aliasing is then discussed,
+and the Accumulation Buffer is shown to be a desirable solution. Finally the generality
+of the Accumulation Buffer is explored, concentrating on its application to the problems
+of motion blur, depth-of-field, and soft shadows.},
+journal = {SIGGRAPH Comput. Graph.},
+month = sep,
+pages = {309–318},
+numpages = {10}
+}
+
+@inproceedings{10.1145/97879.97913,
+author = {Haeberli, Paul and Akeley, Kurt},
+title = {The Accumulation Buffer: Hardware Support for High-Quality Rendering},
+year = {1990},
+isbn = {0897913442},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/97879.97913},
+doi = {10.1145/97879.97913},
+abstract = {This paper describes a system architecture that supports realtime generation of complex
+images, efficient generation of extremely high-quality images, and a smooth trade-off
+between the two.Based on the paradigm of integration, the architecture extends a state-of-the-art
+rendering system with an additional high-precision image buffer. This additional buffer,
+called the Accumulation Buffer, is used to integrate images that are rendered into
+the framebuffer. While originally conceived as a solution to the problem of aliasing,
+the Accumulation Buffer provides a general solution to the problems of motion blur
+and depth-of-field as well.Because the architecture is a direct extension of current
+workstation rendering technology, we begin by discussing the performance and quality
+characteristics of that technology. The problem of spatial aliasing is then discussed,
+and the Accumulation Buffer is shown to be a desirable solution. Finally the generality
+of the Accumulation Buffer is explored, concentrating on its application to the problems
+of motion blur, depth-of-field, and soft shadows.},
+booktitle = {Proceedings of the 17th Annual Conference on Computer Graphics and Interactive Techniques},
+pages = {309–318},
+numpages = {10},
+location = {Dallas, TX, USA},
+series = {SIGGRAPH '90}
+}
+
+@book{GpuGems2008,
+  title={GPU Gems 3},
+  author={Nguyen, H. and NVIDIA Corporation},
+  number={т. 3},
+  isbn={9780321515261},
+  lccn={2007023985},
+  series={Lab Companion Series},
+  url={https://books.google.ru/books?id=ylNyQgAACAAJ},
+  year={2008},
+  publisher={Addison-Wesley}
+}
+
+
+@inproceedings{McGuire12,
+author = {McGuire, Morgan and Hennessy, Padraic and Bukowski, Michael and Osman, Brian},
+title = {A Reconstruction Filter for Plausible Motion Blur},
+year = {2012},
+isbn = {9781450311946},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/2159616.2159639},
+doi = {10.1145/2159616.2159639},
+abstract = {This paper describes a novel filter for simulating motion blur phenomena in real time
+by applying ideas from offline stochastic reconstruction. The filter operates as a
+2D post-process on a conventional framebuffer augmented with a screen-space velocity
+buffer. We demonstrate results on video game scenes rendered and reconstructed in
+real-time on NVIDIA GeForce 480 and Xbox 360 platforms, and show that the same filter
+can be applied to cinematic post-processing of offline-rendered images and real photographs.
+The technique is fast and robust enough that we deployed it in a production game engine
+used at Vicarious Visions.},
+booktitle = {Proceedings of the ACM SIGGRAPH Symposium on Interactive 3D Graphics and Games},
+pages = {135–142},
+numpages = {8},
+location = {Costa Mesa, California},
+series = {I3D '12}
+}
+
+
+@Article{Wloka96,
+author={Wloka Matthias M. and Zeleznik Robert C.},
+title={Interactive real-time motion blur},
+journal={The Visual Computer},
+year={1996},
+month={Jun},
+day={01},
+volume={12},
+number={6},
+pages={283-295},
+abstract={Motion blurring of fast-moving objects is highly desirable for virtual environments and 3D user interfaces. However, all currently known algorithms for generating motion blur are too slow for inclusion in interactive 3D applications. We introduce a new motion-blur algorithm that works in three dimensions on a per object basis. The algorithm operates in real time even for complex objects consisting of several thousand polygons. While it only approximates true motion blur, the generated results are smooth and visually consistent. We achieve this performance break-through by taking advantage of hardware-assisted rendering of semitransparent polygons, a feature commonly available in today's workstations.},
+issn={1432-2315},
+doi={10.1007/BF01782290},
+url={https://doi.org/10.1007/BF01782290}
 }
 
