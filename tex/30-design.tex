@@ -5,8 +5,119 @@
 
 \section{Модификация алгоритма построения изображения с помощью z-буфера}
 
-\subsection{Необходимые данные для построения смаза}
+\subsection{Нахождение точек полигона}
+
+Любой выпуклый полигон можно представить в виде прямых, точки пересечения которых являются точками исходного многоугольника. тогда можно нарисовать прямоугольник при просмотре его сверху вниз
+\begin{lstlisting}
+for (int Ycurr = Ybottom; Ycurr <= Ytop; Ycurr++) {
+  Find (Xleft);
+  Find (Xright);
+  for (int Xcurr = Xleft; Xcurr <= Xright; Xcurr++) {
+    V[Xcurr][Ycurr]= FindColor (Xcurr, Ycurr);
+  };
+};
+\end{lstlisting}
+
+Для нахождения $x_left$ и $x_right$ необходимо найти пересечение сканирующий строки с  отрезками и найти максимальное и минимальное значение.
+
+
+Для упрощения работы значения можно считать пошагово, как 
+$x(y) = ky + m$ => $k = \frac{x_1 - x_0}{y_1 - y_0}$ => $x(y + 1) = x(y) + k$
+
+Координату z у полигона можно получить из уравнения на плоскости: $ax + by + cz + d = 0$. уравнение плоскости можно найти по трем точкам, не лежащих в прямую. 
+
+$\vec{a} = A - B $
+
+$\vec{b} = A - C $
+
+$\vec{a} \times \vec{b} = \begin{bmatrix}
+    a & b & c
+\end{bmatrix}^T$
+
+$\vec{a} \times \vec{b} = \begin{bmatrix}
+    \vec{a}_y \vec{b}_z - \vec{a}_z \vec{b}_y & 
+    \vec{a}_z \vec{b}_x - \vec{a}_x \vec{b}_z &
+    \vec{a}_x \vec{b}_y - \vec{a}_y \vec{b}_x 
+\end{bmatrix}^T$
+
+$ax + by + cz + d = 0$ => $d = -(ax + by + cz)$ => 
+$d = -(a A_x + b A_y + c A_z)$
+
+$ax + by + cz + d = 0$ => $z(x,y) = -\frac{ax + by + d}{c}$
+
+$\frac{\delta z(x,y)}{\delta x} = -\frac{a}{c}$\\
+
+$z(x + 1,y) = z(x, y)  + \frac{\delta z(x,y)}{\delta x} = 
+z(x,y)  -\frac{a}{c}$
+
+
+
+
 \subsection{Нахождение буфера векторов скоростей}
+
+Скорость перемещения пикселя 
+
+$v = \begin{pmatrix}
+\frac{\Delta x}{\Delta T} &
+\frac{\Delta y}{\Delta T} 
+\end{pmatrix}^T$
+
+Для нахождения перемещения каждой точки тела удобно использовать матрицы преобразования.
+
+Для составления буфера скорости нужно анализировать скорости с учетом изменения положения камеры. Поэтому нужно анализировать с помощью произведения матриц преобразования тела и камеры.
+
+Если предположить, что у модели могут меняться только положение в пространстве, поворот и размер относительно центра тела, то можно данное преобразование представить в виде следующей матрицы
+
+$
+T = 
+\begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    x_c & y_c & z_c & 1 \\
+\end{pmatrix} 
+\times 
+\begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & \cos(\alpha_x) & -\sin(\alpha_x) & 0 \\
+    0 & \sin(\alpha_x) & \cos(\alpha_x) & 0 \\
+    0 & 0 & 0 & 1 \\
+\end{pmatrix}
+\times 
+\begin{pmatrix}
+    \cos(\alpha_y) & 0 & -\sin(\alpha_y) & 0 \\
+    0 & 1 & 0 & 0 \\
+    \sin(\alpha_y) & 0 & \cos(\alpha_y) & 0 \\
+    0 & 0 & 0 & 1 \\
+\end{pmatrix}
+\times 
+\begin{pmatrix}
+    \cos(\alpha_z) & -\sin(\alpha_z) & 0 & 0\\
+    \sin(\alpha_z) & \cos(\alpha_z) & 0 & 0\\
+    0 & 0 & 0 & 1 \\
+\end{pmatrix}
+\times
+\begin{pmatrix}
+    s_x & 0 & 0 & 0 \\
+    0 & s_y & 0 & 0 \\
+    0 & 0 & s_z & 0 \\
+    0 & 0 & 0 & 1 \\
+\end{pmatrix}
+\times
+\begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    dx & dy & dz & 1 \\
+\end{pmatrix}
+\times
+\begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+    -x_c & -y_c & -z_c & 1 \\
+\end{pmatrix}
+$
 
 
 \section{Архитектура приложения}
