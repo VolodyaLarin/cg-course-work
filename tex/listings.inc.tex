@@ -1,6 +1,7 @@
 % 8 Листинги
 
 \usepackage{listings}
+% \usepackage{listingsutf8}
 
 % Значения по умолчанию
 \lstset{
@@ -71,6 +72,25 @@
     {|}{\ensuremath{$|$}~}2%
 }[keywords,comments,strings]
 
+\lstdefinelanguage[]{MyPs}[]{}{
+  morekeywords={each,empty,wait,do},% ключевые слова добавлять сюда
+  morecomment=[s]{\{}{\}},
+  literate=
+    {\\\\}{\ensuremath{$\vartriangleright$}~}2%
+    {->}{\ensuremath{$\rightarrow$}~}2%
+    {<-}{\ensuremath{$\leftarrow$}~}2%
+    {==}{\ensuremath{$=$}~}2%
+    {!=}{\ensuremath{$\neq$}~}2%
+    {:=}{\ensuremath{$\leftarrow$}~}2%
+    {\\in}{\ensuremath{$ \in $}~}2%
+    {<--}{\ensuremath{$\Longleftarrow$}~}2%
+    {\\times}{\ensuremath{$\times$}~}2%
+    {<=}{\ensuremath{$\leq$}~}2%
+    {>=}{\ensuremath{$\geq$}~}2%
+}[keywords,comments,strings]
+
 % Подписи к листингам на русском языке.
 \renewcommand\lstlistingname{Листинг}
 \renewcommand\lstlistlistingname{Листинги}
+
+
