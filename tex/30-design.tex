@@ -3,7 +3,7 @@
 
 В данном разделе рассматриваются реализуемые алгоритмы и методы, приводятся выкладки по модификации существующих.
 
-\section{Модификация алгоритма построения изображения с помощью z-буфера}
+\section{Генерация мгновенного снимка и подготовка буферов для работы методов размытия движения}
 
 \subsection{Нахождение точек полигона}
 
@@ -255,7 +255,7 @@
     \end{matrix}
 \end{equation}
 
-\subsection{Алгоритм}
+\subsection{Модификация алгоритма построения изображения с помощью z-буфера}
 
 
 Данный алгоритм для каждого кадра буфер изображения $V$ заполняет цветом фона, буфер глубины $Z$ - максимальной величиной (бесконечностью), буфер скоростей пикселей $v$ зануляет. 
@@ -333,88 +333,178 @@
 
 \subsection{Размытие движения с помощью накопительного буфера}
 
+Данный метод требует создания $N$ мгновенных снимков $shots$ для получения смазанного изображения. Метод достаточно простой в реализации, но требует больших вычислительных затрат по генерации мгновенных снимков. Реализация данного метода для обработки единичного пикселя представлена на псевдокоде \ref{alg:A_AccumulateBufferBlur}.
+
+Рекомендуется подбирать количество снимков и длину выдержки так, чтобы $N$ был кратен $fps \cdot \Delta T$, где $fps$ - частота выходного видео потока, чтобы можно было переиспользовать предыдущие снимки.
+
+\begin{breakablealgorithm}
+    \caption{Размытие движения с помощью накопительного буфера} \label{alg:A_AccumulateBufferBlur}
+    \begin{algorithmic}[1]
+        \Function{AccumulatePixelBlur}{$pixel$, $shots$}
+        \State $color \leftarrow 0$
+        \ForAll{$i \in [0; N)$}
+            \State $color \leftarrow color + shots[i][pixel]$
+        \EndFor
+        \State \Return $color / N$
+        \EndFunction
+\end{algorithmic}
+\end{breakablealgorithm}
 
 \subsection{Размытие движения с помощью скорости пикселя}
+
+Данный метод требует для своей работы наличия буфера скоростей $v$, одного мгновенного снимка (буфера кадра $V$) и количество анализируемых пикселей $N$.  На выходе метода получим буфер кадра со смазом $V_{out}$. Реализация данного метода для единичного пикселя представлена на псевдокоде \ref{alg:A_PerPixelBlur}.
+
+\begin{breakablealgorithm}
+    \caption{Размытие движения с помощью скорости пикселя} \label{alg:A_PerPixelBlur}
+    \begin{algorithmic}[1]
+        \Function{PixelVelocityBlur}{$pixel, V, v$}
+            \State $temp \leftarrow pixel$
+            \State $velocity \leftarrow v[temp] / N$
+            \State $color \leftarrow V[temp]$
+            \ForAll{$i \in [0; N)$}
+                \State $temp \leftarrow temp + velocity$
+                \State $color \leftarrow color + V[temp]$
+            \EndFor
+            \State \Return $color / N$
+        \EndFunction
+\end{algorithmic}
+\end{breakablealgorithm}
+
+
+
+
 \subsection{Размытие движения с помощью максимальной скорости движения участка изображения и буфера глубины}
+
+Данный алгоритм является модификацией предыдущего метода, но в отличии от предыдущего требует для своей работы предварительное формирования буфера максимальной скорости движения участка изображения $v_{neighbor}$ по формуле \eqref{F:F2_3_2} и буфера глубины $Z$. Реализация данного метода для единичного пикселя представлена на псевдокоде \ref{alg:A_McGuireBlur}.
+
+\begin{breakablealgorithm}
+\caption{Размытие движения с помощью максимальной скорости движения участка изображения и буфера глубины} \label{alg:A_McGuireBlur}
+\begin{algorithmic}[1]
+    \Function{McGuireBlur}{$pixel$, $V$, $Z$, $v$, $v_{neighbor}$, }
+        \State $A \leftarrow (x,y)$
+        \State $velocity \leftarrow v_{neighbor}[A/k]$
+        \If{$velocity < \varepsilon$} \Comment Нет размытия 
+            \State \Return $V[A]$
+        \EndIf
+        
+        \State $velocity \leftarrow velocity / N$
+        \State $weight \leftarrow \frac{1}{|velocity[A]|}$
+        \State $color \leftarrow V[A] \cdot weight$
+        
+        \State $B \leftarrow A$
+        \ForAll{$i \in [0; N)$}
+            \State $B \leftarrow B + velocity$
+            \Statex \Comment Тест принадлежности переднему и заднему фону с помощью z-буфера
+            \State $fg \leftarrow softDepthCompare(Z[A],Z[B])$  \Comment см. пункт \ref{cha:analysis_mcgiure} 
+            \State $bg \leftarrow softDepthCompare(Z[B],Z[A])$
+            \Statex
+            \State $w \leftarrow  fg \cdot cone(B,A,v[B])$
+            \State $w \leftarrow  w + bg \cdot cone(A,B,v[A])$
+            \State $w \leftarrow  w + cylinder(A,B,v[A]) \cdot  cylinder(B,A,v[B]) \cdot 2$
+            \Statex
+            \State $color \leftarrow color + w \cdot V[Y]$
+            \State $weight \leftarrow weight + w$
+        \EndFor
+        \State \Return $color / weight$
+    \EndFunction        
+\end{algorithmic}
+\end{breakablealgorithm}
+
+
 
 \section{Архитектура приложения}
 
-\subsection{Компоненты}
-\subsection{Диаграмма класса}
+В данном разделе будет рассмотрена архитектура приложения и способы её масштабирования и возможности модификации.
 
-% \subsection{Протестируем подпункт}
-% \subsubsection{А теперь подподпункт}
+\subsection{Сцена}
 
+Приложение имеет возможность добавить на сцену несколько полигональных моделей и задать их перемещения. С этим замыслом была разработана диаграмма классов сцены, которая представлена на рисунке \ref{fig:uml_scene}.
 
-% \paragraph{Проверка} параграфа. Вроде работает.
-% \paragraph{Вторая проверка} параграфа. Опять работает.
+\begin{figure}[h]
+    \centering
+    \includesvg[width=1\columnwidth,inkscapelatex=false]{img/umls/svg/Model!SceneObject_1.svg}
+    \caption{Диаграмма классов сцены}
+    \label{fig:uml_scene}
+\end{figure}
 
-% Вот.
+Класс сцены Scene является контейнером, который хранит объекты сцены. Объект сцены представлен интерфейсом ISceneObject, который предоставляет методы для задания и получения позиции, поворота, размера объекта в любой момент времени, цвета объекта и получения типа объекта. Для расширения функционала объектов сцены была предусмотрена реализация паттерна Посетитель (IVisitor).
 
-% \begin{itemize}
-% \item Это список с <<палочками>>.
-% \item Хотя он и по ГОСТ, но\dots
-% \end{itemize}
+Класс AnimatedCoordProperty предоставляет возможность задавать начальные и конечные параметры объекта, задаваемые с помощью трехмерного вектора и изменяемые линейно с течением времени.
 
-% \begin{enumerate}
-% \item  Для списка, начинающегося с заглавной буквы, лучше список с цифрами.
-% \end{enumerate}
+На диаграмме представлено два типа объектов: Модель и Камера. Класс камеры Camera предоставляет два метода для получения прямого и обратного преобразований камеры в определенный момент времени. Класс модели Model является контейнером полигонов (Polygon), который является в свою очередь контейнером точек (IPoint).   
 
-% Формула \eqref{F:F1} совершено бессмысленна.
+Данная структура классов позволяет добавлять новые типы объектов и новый функционал к ним. 
 
-% %Кстати, при каких-то условиях <<удавалось>> получить двойный скобки вокруг номеров формул. Вопрос исследуется.
+\subsection{Отрисовка сцены и размытие движения}
+На рисунке \ref{fig:uml_render} представлена диаграмма классов отрисовки сцены.  
 
-% % \begin{equation}
-% % a= cb
-% % \label{F:F1}
-% % \end{equation}
+\begin{figure}[h]
+    \centering
+    \includesvg[width=1\columnwidth,inkscapelatex=false]{img/umls/svg/Model!Renderdiagram_2.svg}
+    \caption{Диаграмма классов отрисовки сцены}
+    \label{fig:uml_render}
+\end{figure}
 
-% А формула~\eqref{eq:fourierrow} имеет некоторый смысл.
-% Кроме этого она пытается иллюстрировать применение окружения \Code{eqndesc} которое размещает формулу совместно с её описанием.
-% Однако обратите внимание на нумерацию формул~\eqref{eq:fourierrow} и \eqref{F:F2}, попробуйте добавить \Code{[H]} к такой формуле.
+Для управления процесса отрисовки был спроектирован класс менеджера отрисовки RenderManager, который формирует изображение, буфер глубины и буфер  скоростей пикселей при необходимости. Для отрисовки используется интерфейс отрисовщика IDrawer, который является адаптером для движков построения изображения, например, SFML, Qt Painter или OpenGL. Для движков, которые не поддерживают матрицы преобразования был подготовлен абстрактный класс BaseNoTrasformationSupportDrawer, который реализует обработку преобразований и их применение при отрисовке полигонов.  
 
-% \begin{eqndesc}
-%     \begin{equation}\label{eq:fourierrow}
-%         f(x) = \frac{a_0}{2} + \sum\limits_{k=1}^{+\infty} A_k\cos\left(k\frac{2\pi}{\tau}x+\theta_k\right)
-%     \end{equation}
+Класс преобразований Transformation, состоит из методов примения преобразования к точке, объединения нескольких преобразований и получения копии преобразования и абстрактной фабрики преобразований.
+Класс абстрактной фабрики преобразований ITransformationFactory создаёт преобразования перемещения, поворота, масштабирования, перспективы и единичное преобразования. С помощью объедения базовых преобразований можно получить любое преобразование, необходимое в рамках работы программы.
 
-%     где $A_k$ "--- амплитуда  k-го гармонического колебания,\\
-%     $A_k$ "--- амплитуда $k$-го гармонического колебания,\\
-%     $ k\frac{2\pi}{\tau} = k\omega$ "--- круговая частота гармонического колебания,\\
-%     $\theta_k$ "--- начальная фаза $k$-го колебания.
-% \end{eqndesc}
+Класс контекста отрисовки RenderContext содержит буферы, которые будут генерироваться и изменяться в процессе отрисовки изображения и использоваться во время генерации размытия изображения.
 
+Для обработки структуры объектов сцены и ее отрисовки используется класс посетителя отрисовки RenderVisitor. Он также позволяет сформировать пространственное преобразование объекта в определенный момент времени.
 
-% Окружение \texttt{cases} опять работает (см. \eqref{F:F2}), спасибо И. Короткову за исправления..
+На рисунке \ref{fig:uml_render} представлена Диаграмма классов размытия движения.  
 
+\begin{figure}[h]
+    \centering
+    \includesvg[width=0.9\columnwidth,inkscapelatex=false]{img/umls/svg/Model!BlurDiagram_3.svg}
+    \caption{Диаграмма классов размытия движения}
+    \label{fig:uml_render}
+\end{figure}
 
-% % \begin{equation}
-% % a= \begin{cases}
-% %  3x + 5y + z, \mbox{если хорошо} \\
-% %  7x - 2y + 4z, \mbox{если плохо}\\
-% %  -6x + 3y + 2z, \mbox{если совсем плохо}
-% % \end{cases}
-% % \label{F:F2}
-% % \end{equation}
+Для выполнения размытия движения используется паттерн стратегия. Интерфейс стратегии размытия IBlurStrategy имеет методы выполнения смаза и получения названия стратегии. Каждая стратегия смаза соответствует методам размытия изображения: с помощью накопительного буфера (AccumulateBlurStrategy), с помощью скорости пикселя (PixelBlurStrategy) и с помощью максимальной скорости
+движения участка изображения и буфера глубины (NeiborBlurStrategy). Стратегия использует параметры размытия BlurConfig, которые содержат менеджер отрисовки, с помощью которого производится формирование нужных данных для определенного метода смаза.
 
-% \section{Подсистема всякой ерунды}
+\subsection{Графический интерфейс}
 
-% Культурная вставка dot-файлов через утилиту dot2tex (рис.~\ref{fig:fig02}).
+Был разработан графический интерфейс приложения. Он представлен на рисунке \ref{fig:gui_window}. 
 
-% \begin{figure}
-%   \centering
-% % [width=0.5\textwidth] --- регулировка ширины картинки
-%   \includegraphics[width=.5\textwidth]{inc/dot/cow2}
-%   \caption{Рисунок}
-%   \label{fig:fig02}
-% \end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{img/gui/common.png}
+    \caption{Общий вид окна}
+    \label{fig:gui_window}
+\end{figure}
 
+В правой половине окна расположены предпросмотр сцены и временная шкала. В левой половине список объектов сцены и параметры в виде вкладок. Все вкладки параметров представлены на рисунке \ref{fig:gui_tabs}
 
-% \subsection{Блок-схема всякой ерунды}
+\begin{figure}[h]
+    \centering
+    \begin{minipage}[h]{0.32\linewidth}
+        \center{
+            \includegraphics[width=\linewidth]{img/gui/tab1.png} \\ а)
+            }
+    \end{minipage}
+    \hfill\begin{minipage}[h]{0.32\linewidth}
+        \center{
+            \includegraphics[width=\linewidth]{img/gui/tab2.png} \\ б)
+            }
+    \end{minipage}
+    \hfill
+    \begin{minipage}[h]{0.32\linewidth}
+        \center{
+            \includegraphics[width=\linewidth]{img/gui/tab3.png} \\ в)
+            }
+    \end{minipage}
+    \caption{Вкладка параметров \\
+    а) сцены объекта 
+    б) размытия движения
+    в) вывода в файл}
+    \label{fig:gui_tabs}
+\end{figure}
 
-% \subsubsection*{Кстати о заголовках}
-
-% У нас есть и \Code{subsubsection}. Только лучше её не нумеровать.
+Для изменения параметров определенного объекта пользователю необходимо выбрать нужный объект из списка объектов и внести изменения во вкладке параметров объекта. Также возможно внести изменения в параметры размытия и вывода. 
 
 %%% Local Variables:
 %%% mode: latex

@@ -55,6 +55,13 @@
 \algrenewtext{EndBlock}{\textbf{Конец блока}}
 \algrenewtext{ElsIf}{\textbf{иначе если }}
 
+\renewcommand{\thealgorithm}{\thechapter.\arabic{algorithm}}%
+
+\makeatletter
+\@addtoreset{algorithm}{chapter}% algorithm counter resets every chapter
+\makeatother
+
+
 
 % Fix breaking algos per page 
 \makeatletter
@@ -77,5 +84,3 @@
    \end{center}
   }
 \makeatother
-
-\renewcommand{\thealgorithm}{\thechapter.\arabic{algorithm}}%
