@@ -10,12 +10,48 @@
 % Сюда пихать новые языки
 \newcommand{\makenewmintedenviromnents}[1]{%
   \newminted{c}{#1}%
+  \newminted{c++}{#1}%
   \newminted{ebnf}{#1}%
   \newminted{python}{#1}%
   \newmintedfile{c}{#1}%
+  \newmintedfile{c++}{#1}%
   \newmintedfile{ebnf}{#1}%
   \newmintedfile{python}{#1}%
 }
+
+
+\definecolor{mygray}{rgb}{0.4,0.4,0.4}
+\definecolor{mygreen}{rgb}{0,0.8,0.6}
+\definecolor{myorange}{rgb}{1.0,0.4,0}
+
+\lstdefinelanguage{c++}
+{
+  keywords = {typeof, new, true, false, function, return, null, switch, var, if, in, while, do, else, case, break, class, export, boolean, throw, implements, import, this, constructor, string, number, public, private, static, const, var, let, void},
+  morekeywords = [2]{class, export, boolean, throw, implements, import, this, interface},
+  morekeywords = [3]{Promise, Observable},
+  morekeywords = [4]{log},
+  otherkeywords = {;},
+  comment = [l]{//},
+  morecomment = [s]{/*}{*/},
+  morestring = [b]',
+  morestring = [b]",
+}
+
+\lstset{
+language=c++,
+basicstyle=\footnotesize\sffamily\color{black},
+commentstyle=\color{mygray},
+frame=single,
+numbers=left,
+numbersep=5pt,
+numberstyle=\tiny\color{mygray},
+keywordstyle=\color{mygreen},
+showspaces=false,
+showstringspaces=false,
+stringstyle=\color{myorange},
+tabsize=2
+}
+
 
 % Магия! Здесь происходит непосредственное определение всех окружений
 \expandafter\makenewmintedenviromnents\expandafter{\mintedoptions}
